@@ -3,8 +3,6 @@ from dotenv import load_dotenv
 from langchain_community.vectorstores import FAISS
 from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_google_genai import ChatGoogleGenerativeAI
-from langchain.chains import RetrievalQA
-
 load_dotenv()
 embeddings = HuggingFaceEmbeddings(
     model_name="sentence-transformers/all-MiniLM-L6-v2"
@@ -21,12 +19,9 @@ llm = ChatGoogleGenerativeAI(
     model="gemini-2.5-flash",
     temperature=0
 )
-qa = RetrievalQA.from_chain_type(
-    llm=llm,
-    retriever=retriever
-)
+
 def ask(question):
-    docs = retriever.get_relevant_documents(question)
+    docs = retriever.invoke(question)
 
     if not docs:
         return "Sorry, this question is outside the football knowledge base."
