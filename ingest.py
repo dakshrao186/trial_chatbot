@@ -11,7 +11,7 @@ from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_community.vectorstores import FAISS
 load_dotenv()
 documents = []
-# Load TXT and PDF files
+# Load TXT, PDF and CSV files
 DATA_FOLDER = "data"
 if os.path.exists(DATA_FOLDER):
     for file in os.listdir(DATA_FOLDER):
@@ -24,6 +24,19 @@ if os.path.exists(DATA_FOLDER):
             loader = PyPDFLoader(path)
             documents.extend(loader.load())
             print(f"Loaded PDF: {file}")
+        elif file.endswith(".csv"):
+            df = pd.read_csv(path)
+            for index, row in df.iterrows():
+                text = ""
+                for column in df.columns:
+                    text += f"{column}: {row[column]}\n"
+                documents.append(
+                    Document(
+                        page_content=text,
+                        metadata={"source": file, "row": index}
+                    )
+                )
+            print(f"Loaded CSV: {file}")
 # Load CSV files
 DATASET_FOLDER = "dataset"
 if os.path.exists(DATASET_FOLDER):
